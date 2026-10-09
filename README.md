@@ -1,159 +1,139 @@
-# Turborepo starter
+<div align="center">
 
-This Turborepo starter is maintained by the Turborepo core team.
+# OpenBots
 
-## Using this example
+### Autonomous AI Coworkers for Humans Who Ship
 
-Run the following command:
+OpenBots is an open-source platform where you can build, customize, and collaborate with teams of autonomous AI agents. Unlike simple chatbots that only talk, OpenBots agents research the web, write code, run scheduled tasks in the background, send emails, connect to your SaaS apps, generate interactive visual artifacts and many other things.
 
-```sh
-npx create-turbo@latest
-```
+</div>
 
-## What's inside?
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+## What is OpenBots?
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+Imagine having a dedicated team of digital colleagues:
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- A **Research Assistant** that searches the web, reads docs, cross-references sources, and delivers concise summaries.
+- A **Social Media Manager** that drafts and publishes technical updates to LinkedIn or Twitter every day at 9:00 AM on a cron schedule.
+- A **Full-Stack Developer** that inspects bugs, runs safe sandboxed code, and builds interactive HTML, SVG, or Mermaid diagrams directly inside the chat.
+- An **Executive Assistant** that connects with Gmail, Slack, Notion, and Google Calendar to schedule meetings and manage follow-ups.
 
-### Utilities
+OpenBots gives you an elegant, fast workspace to orchestrate these agents effortlessly.
 
-This Turborepo has some additional tools already setup for you:
+---
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## A Walkthrough of OpenBots
 
-### Build
+Take a visual tour through everything you can do in OpenBots:
 
-To build all apps and packages, run the following command:
+### 1. Dedicated Agents with Personalities & Roles
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Create distinct agents for any purpose. Give each agent their own:
 
-```sh
-cd my-turborepo
-turbo build
-```
+- **System Instructions**: Define their tone, rules, domain knowledge, and exact boundaries.
+- **Model Intelligence**: Select from state-of-the-art reasoning models like Google's Gemini, Anthropic Claude, OpenAI or OpenRouter.
+- **Distinct Avatars**: Auto-generated animated Avatars give each agent an expressive visual identity.
+- **Allowed Tools**: Turn specific tools on or off so agents only have the capabilities they need.
 
-Without global `turbo`, use your package manager:
+### 2. Rich Conversational Workspace
 
-```sh
-cd my-turborepo
-npx turbo build
-bun exec turbo build
-bun exec turbo build
-```
+add preview-chat image here
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Collaborate in a focused, clutter-free chat environment:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+- **Streaming Responses**: Clean, jitter-free streaming that renders smoothly as thoughts are formed.
+- **Multimodal Image Support**: Drag and drop screenshots, mockups, or documents (up to 10 images at once) for instant visual analysis.
+- **Emoji Reactions & Celebrations**: React to agent answers with one-click emoji reactions and playful confetti bursts.
 
-```sh
-turbo build --filter=docs
-```
+add preview-reactions image here preview-reactions
 
-Without global `turbo`:
+- **Thread History & Message Splitting**: Long conversational responses are cleanly structured into digestible thoughts with full search and history.
 
-```sh
-npx turbo build --filter=docs
-bun exec turbo build --filter=docs
-bun exec turbo build --filter=docs
-```
+### 3. Human-Readable Activity Stream (Not Raw Debug Logs)
 
-### Develop
+When autonomous agents think and work, you shouldn't have to decipher walls of raw API JSON:
 
-To develop all apps and packages, run the following command:
+- Instead of showing messy internal tool calls like `web_search -> http_request -> json_parse`, OpenBots presents high-level activity:
+  - **"Researching"** _(4 sources analyzed)_
+  - **"Created the report"** _(analysis.md)_
+  - **"Sent the email"** _(to the requested recipient)_
+- Need to look under the hood? Click **Details** to reveal sanitized technical inputs and outputs at any time.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+### 4. Interactive Artifacts & Sandboxes
 
-```sh
-cd my-turborepo
-turbo dev
-```
+add preview-artifacts image here
 
-Without global `turbo`, use your package manager:
+When your agent creates code, designs, or diagrams, it doesn't just print raw text — it generates living **Artifacts**:
 
-```sh
-cd my-turborepo
-npx turbo dev
-bun exec turbo dev
-bun exec turbo dev
-```
+- **Interactive HTML/CSS**: Live preview responsive web interfaces, dashboards, and UI prototypes directly in an expandable side sheet.
+- **Mermaid Flowcharts & Architectures**: Automatically render system flows, sequence diagrams, and entity-relationship models.
+- **Vector SVGs**: Render logos, icons, and illustrations.
+- **Copy & Export**: Switch seamlessly between preview and code with one click.
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### 5. Durable Background Workflows, Scheduling & Web Push
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+add preview-schedules image here
 
-```sh
-turbo dev --filter=web
-```
+Agents don't only react when you prompt them — they can run autonomously on their own:
 
-Without global `turbo`:
+- **Delayed Execution**: Ask your agent to _"remind me in 30 minutes"_ or _"summarize market closes at 5:00 PM"_.
+- **Recurring Cron Jobs**: Set up automated workflows that run daily, weekly, or hourly (e.g. _"Check GitHub issues every weekday morning"_).
+- **Live Realtime SSE Streaming**: When scheduled tasks fire, your active workspace immediately connects via Server-Sent Events (SSE) to stream thought processes, tool steps, and outputs in real time without refreshing.
+- **Native Web Push Notifications**: Stay updated even when away from your browser with desktop & mobile Web Push notifications when scheduled tasks finish.
+- **Survives Restarts**: Powered by Trigger.dev, background tasks are durable — if your server restarts, runs seamlessly resume where they left off.
 
-```sh
-npx turbo dev --filter=web
-bun exec turbo dev --filter=web
-bun exec turbo dev --filter=web
-```
+### 6. 200+ SaaS Integrations via Composio & MCP
 
-### Remote Caching
+add preview-connections image here
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+Connect your agents to the real world:
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+- **Productivity & Docs**: Gmail, Google Calendar, Google Drive, Google Docs, Notion.
+- **Developer Tools**: GitHub, Linear, Jira, Asana, PostHog.
+- **Communication & Social**: Slack, Discord, Twitter (X), LinkedIn.
+- **Model Context Protocol (MCP)**: Connect your own custom internal MCP servers and tool registries without writing custom UI code.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+---
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+## Quick Start
 
-```sh
-cd my-turborepo
-turbo login
-```
+### Try It Locally in 5 Minutes
 
-Without global `turbo`, use your package manager:
+1. **Clone the repository**:
 
-```sh
-cd my-turborepo
-npx turbo login
-bun exec turbo login
-bun exec turbo login
-```
+   ```bash
+   git clone <repo_url>
+   cd openbots
+   bun install
+   ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+2. **Configure your keys**:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+   ```bash
+   cp .env.example .env
+   ```
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+   Add your PostgreSQL database URL and your OpenRouter API key (`OPENROUTER_API_KEY`) or configure via web ui > settings.
 
-```sh
-turbo link
-```
+3. **Initialize the database**:
 
-Without global `turbo`:
+   ```bash
+   cd packages/db
+   bun run db:push
+   ```
 
-```sh
-npx turbo link
-bun exec turbo link
-bun exec turbo link
-```
+4. **Launch the app**:
+   ```bash
+   # From project root
+   bun run dev
+   ```
 
-## Useful Links
+Open [http://localhost:3000](http://localhost:3000) and create your first agent!
 
-Learn more about the power of Turborepo:
+---
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+## License
+
+OpenBots is open-source software licensed under the [MIT License](LICENSE).

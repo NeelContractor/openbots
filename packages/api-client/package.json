@@ -1,0 +1,23 @@
+{
+  "name": "@openbots/api-client",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openbots/api-contract": "workspace:*",
+    "hono": "^4.7.11"
+  },
+  "devDependencies": {
+    "@openbots/typescript-config": "workspace:*",
+    "@types/node": "^20",
+    "typescript": "^5"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

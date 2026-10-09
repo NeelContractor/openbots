@@ -1,0 +1,12 @@
+{
+  "extends": "@openbots/typescript-config/library.json",
+  "compilerOptions": {
+    "declaration": false,
+    "declarationMap": false,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "trigger.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,49 @@
+{
+  "name": "api",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --env-file=../../.env --hot src/index.ts",
+    "start": "bun run --env-file=../../.env ./dist/index.js",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --banner:js=\"import { createRequire } from 'module'; const require = createRequire(import.meta.url);\" --outfile=dist/index.js --external:hono --external:@hono/node-server --external:better-auth --external:resend --external:drizzle-orm --external:postgres --external:ioredis --external:@composio/core --external:undici",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "bun run --env-file=../../.env test-agent-runtime.ts",
+    "trigger:dev": "bunx trigger.dev@latest dev",
+    "trigger:deploy": "bunx trigger.dev@latest deploy"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.71",
+    "@ai-sdk/google": "^4.0.0",
+    "@ai-sdk/openai": "^4.0.83",
+    "@composio/core": "^0.22.0",
+    "@composio/vercel": "^0.12.0",
+    "@modelcontextprotocol/client": "^2.2.0",
+    "@openbots/api-contract": "workspace:*",
+    "@openbots/db": "workspace:*",
+    "@trigger.dev/sdk": "4.7.3",
+    "ai": "^7.0.0",
+    "better-auth": "^1.7.7",
+    "drizzle-orm": "^0.45.3",
+    "esbuild": "^0.28.2",
+    "hono": "^4.7.11",
+    "ioredis": "^6.0.0",
+    "pg": "^8.23.1",
+    "postgres": "^3.4.9",
+    "undici": "^8.11.2",
+    "web-push": "^3.6.7",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@openbots/typescript-config": "workspace:*",
+    "@trigger.dev/build": "4.7.3",
+    "@types/node": "^20",
+    "@types/web-push": "^3.6.4",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  }
+}
