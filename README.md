@@ -39,7 +39,7 @@ Create distinct agents for any purpose. Give each agent their own:
 
 ### 2. Rich Conversational Workspace
 
-add preview-chat image here
+![Chat](./apps/web/public/preview-chat.png)
 
 Collaborate in a focused, clutter-free chat environment:
 
@@ -47,7 +47,7 @@ Collaborate in a focused, clutter-free chat environment:
 - **Multimodal Image Support**: Drag and drop screenshots, mockups, or documents (up to 10 images at once) for instant visual analysis.
 - **Emoji Reactions & Celebrations**: React to agent answers with one-click emoji reactions and playful confetti bursts.
 
-add preview-reactions image here preview-reactions
+![Chat](./apps/web/public/preview-reactions.png)
 
 - **Thread History & Message Splitting**: Long conversational responses are cleanly structured into digestible thoughts with full search and history.
 
@@ -63,7 +63,7 @@ When autonomous agents think and work, you shouldn't have to decipher walls of r
 
 ### 4. Interactive Artifacts & Sandboxes
 
-add preview-artifacts image here
+![Chat](./apps/web/public/preview-artifacts.png)
 
 When your agent creates code, designs, or diagrams, it doesn't just print raw text — it generates living **Artifacts**:
 
@@ -74,7 +74,7 @@ When your agent creates code, designs, or diagrams, it doesn't just print raw te
 
 ### 5. Durable Background Workflows, Scheduling & Web Push
 
-add preview-schedules image here
+![Chat](./apps/web/public/preview-schedules.png)
 
 Agents don't only react when you prompt them — they can run autonomously on their own:
 
@@ -86,7 +86,7 @@ Agents don't only react when you prompt them — they can run autonomously on th
 
 ### 6. 200+ SaaS Integrations via Composio & MCP
 
-add preview-connections image here
+![Chat](./apps/web/public/preview-connections.png)
 
 Connect your agents to the real world:
 
@@ -104,7 +104,7 @@ Connect your agents to the real world:
 1. **Clone the repository**:
 
    ```bash
-   git clone <repo_url>
+   git clone https://github.com/NeelContractor/openbots
    cd openbots
    bun install
    ```
