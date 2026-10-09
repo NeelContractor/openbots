@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@openbots/typescript-config": "*",
-    "@repo/eslint-config": "*",
+    "@openbots/eslint-config": "*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "26.4.1",
     "@types/react": "19.2.18",

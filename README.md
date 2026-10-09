@@ -109,22 +109,27 @@ Connect your agents to the real world:
    bun install
    ```
 
-2. **Configure your keys**:
+2. **Start infrastructure (Postgres + Redis)**:
+
+   ```bash
+   bun run db:up
+   ```
+
+3. **Configure environment variables**:
 
    ```bash
    cp .env.example .env
    ```
 
-   Add your PostgreSQL database URL and your OpenRouter API key (`OPENROUTER_API_KEY`) or configure via web ui > settings.
+   Update `.env` with your values (e.g. `DATABASE_URL`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `TRIGGER_SECRET_KEY`, `TRIGGER_PROJECT_REF`, `COMPOSIO_API_KEY`, `BETTER_AUTH_SECRET`, `VAPID_*` keys). You can also add AI provider keys (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`, etc.) or configure them via the web UI.
 
-3. **Initialize the database**:
+5. **Initialize the database**:
 
    ```bash
-   cd packages/db
    bun run db:push
    ```
 
-4. **Launch the app**:
+6. **Launch the app**:
    ```bash
    # From project root
    bun run dev
