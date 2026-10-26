@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations } from "drizzle-orm"
 import {
   boolean,
   index,
@@ -9,14 +9,14 @@ import {
   timestamp,
   unique,
   uuid,
-} from "drizzle-orm/pg-core";
-import { agents } from "./agents.js";
+} from "drizzle-orm/pg-core"
+import { agents } from "./agents.js"
 
 export const agentToolProviderEnum = pgEnum("agent_tool_provider", [
   "internal",
   "composio",
   "mcp",
-]);
+])
 
 export const agentTools = pgTable(
   "agent_tools",
@@ -44,14 +44,14 @@ export const agentTools = pgTable(
       table.toolName,
     ),
   ],
-);
+)
 
 export const agentToolsRelations = relations(agentTools, ({ one }) => ({
   agent: one(agents, {
     fields: [agentTools.agentId],
     references: [agents.id],
   }),
-}));
+}))
 
-export type AgentTool = typeof agentTools.$inferSelect;
-export type NewAgentTool = typeof agentTools.$inferInsert;
+export type AgentTool = typeof agentTools.$inferSelect
+export type NewAgentTool = typeof agentTools.$inferInsert

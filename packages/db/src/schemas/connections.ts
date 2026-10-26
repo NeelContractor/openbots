@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations } from "drizzle-orm"
 import {
   index,
   jsonb,
@@ -8,14 +8,14 @@ import {
   timestamp,
   unique,
   uuid,
-} from "drizzle-orm/pg-core";
-import { user } from "./auth.js";
+} from "drizzle-orm/pg-core"
+import { user } from "./auth.js"
 
 export const connectionStatusEnum = pgEnum("connection_status", [
   "active",
   "disconnected",
   "error",
-]);
+])
 
 export const connections = pgTable(
   "connections",
@@ -44,14 +44,14 @@ export const connections = pgTable(
       table.externalAccountId,
     ),
   ],
-);
+)
 
 export const connectionsRelations = relations(connections, ({ one }) => ({
   user: one(user, {
     fields: [connections.userId],
     references: [user.id],
   }),
-}));
+}))
 
-export type Connection = typeof connections.$inferSelect;
-export type NewConnection = typeof connections.$inferInsert;
+export type Connection = typeof connections.$inferSelect
+export type NewConnection = typeof connections.$inferInsert

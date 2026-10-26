@@ -1,36 +1,44 @@
-export type MessageRole = "system" | "user" | "assistant" | "tool";
+export type MessageRole = "system" | "user" | "assistant" | "tool"
 
 export type ReplyTarget = {
-  id: string;
-  sender: string;
-  text: string;
-};
+  id: string
+  sender: string
+  text: string
+}
+
+export type AttachmentItem = {
+  url: string
+  path: string
+  name: string
+  mimeType: string
+  sizeBytes?: number
+}
 
 export type MessageItem = {
-  id: string;
-  conversationId: string;
-  role: MessageRole;
-  content: unknown;
-  metadata?: Record<string, any> | null;
-  createdAt: string | Date;
-};
+  id: string
+  conversationId: string
+  role: MessageRole
+  content: unknown
+  metadata?: Record<string, any> | null
+  createdAt: string | Date
+}
 
 export type Conversation = {
-  id: string;
-  agentId?: string;
-  title?: string | null;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-};
+  id: string
+  agentId?: string
+  title?: string | null
+  createdAt?: string | Date
+  updatedAt?: string | Date
+}
 
 export type ConversationPagination = {
-  nextCursor: string | null;
-  hasMore: boolean;
-  limit: number;
-};
+  nextCursor: string | null
+  hasMore: boolean
+  limit: number
+}
 
 export type ConversationResponse = {
-  conversation: Conversation;
-  messages: MessageItem[];
-  pagination?: ConversationPagination;
-};
+  conversation: Conversation
+  messages: MessageItem[]
+  pagination?: ConversationPagination
+}

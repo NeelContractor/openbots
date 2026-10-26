@@ -5,27 +5,23 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "typecheck": "turbo run typecheck",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:push": "turbo run db:push"
   },
   "devDependencies": {
-    "prettier": "3.9.6",
-    "turbo": "^2.11.7",
-    "typescript": "7.0.2",
-    "@openbots/typescript-config": "workspace:*"
+    "@biomejs/biome": "2.6.3",
+    "@openbots/typescript-config": "workspace:*",
+    "turbo": "^2.11.10",
+    "typescript": "7.0.2"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=20.9.0"
   },
-  "devEngines": {
-    "packageManager": {
-      "name": "bun",
-      "version": "1.4.0"
-    }
-  },
+  "packageManager": "bun@1.4.0",
   "workspaces": [
     "apps/*",
     "packages/*"

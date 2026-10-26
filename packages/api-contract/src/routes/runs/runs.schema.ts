@@ -1,3 +1,5 @@
+import { z } from "zod"
+
 export const RunStatus = {
   QUEUED: "queued",
   RUNNING: "running",
@@ -5,6 +7,6 @@ export const RunStatus = {
   COMPLETED: "completed",
   FAILED: "failed",
   CANCELLED: "cancelled",
-} as const;
+} as const
 
-export type RunStatus = (typeof RunStatus)[keyof typeof RunStatus];
+export type RunStatus = (typeof RunStatus)[keyof typeof RunStatus]

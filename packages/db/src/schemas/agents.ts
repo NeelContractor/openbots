@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations } from "drizzle-orm"
 import {
   index,
   integer,
@@ -7,23 +7,23 @@ import {
   text,
   timestamp,
   uuid,
-} from "drizzle-orm/pg-core";
-import { agentTools } from "./agent-tools.js";
-import { user } from "./auth.js";
-import { conversations } from "./conversations.js";
-import { runs } from "./runs.js";
+} from "drizzle-orm/pg-core"
+import { agentTools } from "./agent-tools.js"
+import { user } from "./auth.js"
+import { conversations } from "./conversations.js"
+import { runs } from "./runs.js"
 
 export const agentStatusEnum = pgEnum("agent_status", [
   "active",
   "paused",
   "archived",
-]);
+])
 
 export const agentAutonomyEnum = pgEnum("agent_autonomy", [
   "manual",
   "approved",
   "autonomous",
-]);
+])
 
 export const agents = pgTable(
   "agents",
@@ -48,7 +48,7 @@ export const agents = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [index("agents_user_id_idx").on(table.userId)],
-);
+)
 
 export const agentsRelations = relations(agents, ({ one, many }) => ({
   user: one(user, {
@@ -58,7 +58,7 @@ export const agentsRelations = relations(agents, ({ one, many }) => ({
   tools: many(agentTools),
   conversations: many(conversations),
   runs: many(runs),
-}));
+}))
 
-export type Agent = typeof agents.$inferSelect;
-export type NewAgent = typeof agents.$inferInsert;
+export type Agent = typeof agents.$inferSelect
+export type NewAgent = typeof agents.$inferInsert

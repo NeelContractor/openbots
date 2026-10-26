@@ -8,7 +8,6 @@ OpenBots is an open-source platform where you can build, customize, and collabor
 
 </div>
 
-
 ---
 
 ## What is OpenBots?
@@ -123,13 +122,14 @@ Connect your agents to the real world:
 
    Update `.env` with your values (e.g. `DATABASE_URL`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `TRIGGER_SECRET_KEY`, `TRIGGER_PROJECT_REF`, `COMPOSIO_API_KEY`, `BETTER_AUTH_SECRET`, `VAPID_*` keys). You can also add AI provider keys (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`, etc.) or configure them via the web UI.
 
-5. **Initialize the database**:
+4. **Initialize the database**:
 
    ```bash
    bun run db:push
    ```
 
-6. **Launch the app**:
+5. **Launch the app**:
+
    ```bash
    # From project root
    bun run dev

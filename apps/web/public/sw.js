@@ -1,6 +1,6 @@
 // OpenBots Service Worker for Background Web Push Notifications
 self.addEventListener("push", (event) => {
-  if (!event.data) return;
+  if (!event.data) return
 
   let payload = {
     title: "OpenBots Alert",
@@ -9,13 +9,13 @@ self.addEventListener("push", (event) => {
     icon: "/favicon.ico",
     badge: "/favicon.ico",
     tag: "openbots-notification",
-  };
+  }
 
   try {
-    const data = event.data.json();
-    payload = { ...payload, ...data };
+    const data = event.data.json()
+    payload = { ...payload, ...data }
   } catch {
-    payload.body = event.data.text();
+    payload.body = event.data.text()
   }
 
   const notificationOptions = {
@@ -26,35 +26,38 @@ self.addEventListener("push", (event) => {
     data: {
       url: payload.url || "/",
     },
-    requireInteraction: false,
+    requireInteraction: true,
     vibrate: [200, 100, 200],
-  };
+    renotify: true,
+  }
 
   event.waitUntil(
     self.registration.showNotification(payload.title, notificationOptions),
-  );
-});
+  )
+})
 
 self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
+  event.notification.close()
 
-  const targetUrl = event.notification.data?.url || "/";
+  const targetUrl = event.notification.data?.url || "/"
 
   event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
-      // Check if there is already a window open with this URL or app origin
-      for (const client of windowClients) {
-        if (client.url.includes(self.location.origin) && "focus" in client) {
-          if ("navigate" in client) {
-            client.navigate(targetUrl);
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((windowClients) => {
+        // Check if there is already a window open with this URL or app origin
+        for (const client of windowClients) {
+          if (client.url.includes(self.location.origin) && "focus" in client) {
+            if ("navigate" in client) {
+              client.navigate(targetUrl)
+            }
+            return client.focus()
           }
-          return client.focus();
         }
-      }
-      // If no window is open, open a new window
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
-    }),
-  );
-});
+        // If no window is open, open a new window
+        if (clients.openWindow) {
+          return clients.openWindow(targetUrl)
+        }
+      }),
+  )
+})

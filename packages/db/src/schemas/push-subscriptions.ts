@@ -1,12 +1,6 @@
-import { relations } from "drizzle-orm";
-import {
-  index,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
-import { user } from "./auth.js";
+import { relations } from "drizzle-orm"
+import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import { user } from "./auth.js"
 
 export const pushSubscriptions = pgTable(
   "push_subscriptions",
@@ -31,7 +25,7 @@ export const pushSubscriptions = pgTable(
     index("push_subscriptions_user_id_idx").on(table.userId),
     index("push_subscriptions_endpoint_idx").on(table.endpoint),
   ],
-);
+)
 
 export const pushSubscriptionsRelations = relations(
   pushSubscriptions,
@@ -41,7 +35,7 @@ export const pushSubscriptionsRelations = relations(
       references: [user.id],
     }),
   }),
-);
+)
 
-export type PushSubscription = typeof pushSubscriptions.$inferSelect;
-export type NewPushSubscription = typeof pushSubscriptions.$inferInsert;
+export type PushSubscription = typeof pushSubscriptions.$inferSelect
+export type NewPushSubscription = typeof pushSubscriptions.$inferInsert

@@ -3,6 +3,7 @@
   "display": "Library",
   "extends": "./base.json",
   "compilerOptions": {
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["node"]
   }
 }

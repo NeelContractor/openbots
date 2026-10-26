@@ -1,6 +1,6 @@
-import { createClient } from "@openbots/api-client";
+import { createClient } from "@openbots/api-client"
 
-let clientInstance: ReturnType<typeof createClient> | null = null;
+let clientInstance: ReturnType<typeof createClient> | null = null
 
 export function getClient() {
   if (!clientInstance) {
@@ -9,18 +9,18 @@ export function getClient() {
         credentials: "include",
       },
       headers: () => {
-        const headers: Record<string, string> = {};
+        const headers: Record<string, string> = {}
         if (typeof window !== "undefined") {
           const token =
             localStorage.getItem("bearer_token") ||
-            localStorage.getItem("better-auth_token");
+            localStorage.getItem("better-auth_token")
           if (token) {
-            headers.Authorization = `Bearer ${token}`;
+            headers.Authorization = `Bearer ${token}`
           }
         }
-        return headers;
+        return headers
       },
-    });
+    })
   }
-  return clientInstance;
+  return clientInstance
 }

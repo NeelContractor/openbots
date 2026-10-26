@@ -221,7 +221,7 @@ function buildHead(theme: "light" | "dark") {
 
 export function withDesignSystem(
   html: string,
-  theme: "light" | "dark" = "light"
+  theme: "light" | "dark" = "light",
 ) {
   const head = buildHead(theme)
 
@@ -236,7 +236,7 @@ export function withDesignSystem(
   if (/<html[^>]*>/i.test(cleaned)) {
     return cleaned.replace(
       /<html[^>]*>/i,
-      (match) => `${match}<head>${head}</head>`
+      (match) => `${match}<head>${head}</head>`,
     )
   }
 

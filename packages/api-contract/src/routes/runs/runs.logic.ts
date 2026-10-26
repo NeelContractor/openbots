@@ -1,6 +1,9 @@
-import { db, getRedis, runSteps, runs } from "@openbots/db";
-import { runs as triggerRuns } from "@trigger.dev/sdk";
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { db, getRedis, messages, runSteps, runs } from "@openbots/db"
+import { runs as triggerRuns } from "@trigger.dev/sdk"
+import { and, asc, desc, eq, inArray } from "drizzle-orm"
+import { agentEventHub, getDirectRunCanceller } from "./runs.events.js"
+
+export * from "./runs.events.js"
 
 export async function listRuns(userId: string, agentId?: string) {
   const userRuns = await db
@@ -11,8 +14,8 @@ export async function listRuns(userId: string, agentId?: string) {
         ? and(eq(runs.userId, userId), eq(runs.agentId, agentId))
         : eq(runs.userId, userId),
     )
-    .orderBy(desc(runs.createdAt));
-  return { runs: userRuns };
+    .orderBy(desc(runs.createdAt))
+  return { runs: userRuns }
 }
 
 export async function getRun(runId: string, userId: string) {
@@ -26,22 +29,25 @@ export async function getRun(runId: string, userId: string) {
       .from(runSteps)
       .where(eq(runSteps.runId, runId))
       .orderBy(asc(runSteps.stepNumber)),
-  ]);
+  ])
 
   if (!run) {
-    return null;
+    return null
   }
 
-  return { run, steps };
+  return { run, steps }
 }
 
 export async function cancelRun(runId: string, userId: string) {
   // Concurrency-safe conditional update: only cancel if run is currently queued or running.
   // Terminal states (completed, failed, cancelled) can NEVER be overwritten.
+  const stopMessageText = "Execution stopped by user."
+
   const [cancelled] = await db
     .update(runs)
     .set({
       status: "cancelled",
+      output: { text: stopMessageText },
       completedAt: new Date(),
     })
     .where(
@@ -51,244 +57,74 @@ export async function cancelRun(runId: string, userId: string) {
         inArray(runs.status, ["queued", "running"]),
       ),
     )
-    .returning();
+    .returning()
 
   if (cancelled) {
-    // Fire-and-forget cancellation to Trigger.dev so the user gets an instant 200 response
-    triggerRuns.cancel(runId).catch(() => {});
-    return { run: cancelled, status: 200 as const };
+    // 0. If run has an active conversation, insert a clear assistant message indicating it was stopped
+    if (cancelled.conversationId) {
+      try {
+        await db.insert(messages).values({
+          conversationId: cancelled.conversationId,
+          role: "assistant",
+          content: { text: stopMessageText },
+        })
+      } catch (msgErr) {
+        console.warn("Failed to insert cancellation message:", msgErr)
+      }
+    }
+    // 1. Abort local running process immediately if active on this worker
+    try {
+      getDirectRunCanceller()?.(runId, "Run cancelled by user")
+    } catch {}
+
+    // 2. Broadcast cancellation event and fast lookup key over Redis so any worker instance running this job aborts
+    try {
+      const redis = getRedis()
+      if (redis) {
+        const channelKey = `run_events:${runId}`
+        const cancelEvent = {
+          type: "status",
+          status: "cancelled",
+          output: { text: stopMessageText },
+        }
+        const cancelFlagKey = `run_cancelled:${runId}`
+        await Promise.allSettled([
+          redis.set(cancelFlagKey, "1", { ex: 3600 }),
+          redis
+            .rpush(channelKey, JSON.stringify(cancelEvent))
+            .then(() => redis.expire(channelKey, 3600)),
+        ])
+        if (cancelled.agentId) {
+          agentEventHub.publish(
+            cancelled.agentId,
+            {
+              type: "run_status",
+              runId,
+              status: "cancelled",
+              output: { text: stopMessageText },
+              conversationId: cancelled.conversationId,
+            },
+            userId,
+          )
+        }
+      }
+    } catch {}
+
+    // 3. Fire-and-forget cancellation to Trigger.dev for serverless task workers
+    triggerRuns.cancel(runId).catch(() => {})
+    return { run: cancelled, status: 200 as const }
   }
 
   // If 0 rows updated, verify whether run exists and return current terminal state
   const [existingRun] = await db
     .select()
     .from(runs)
-    .where(and(eq(runs.id, runId), eq(runs.userId, userId)));
+    .where(and(eq(runs.id, runId), eq(runs.userId, userId)))
 
   if (!existingRun) {
-    return { error: "Run not found", status: 404 as const };
+    return { error: "Run not found", status: 404 as const }
   }
 
   // Already terminal (completed, failed, cancelled) - safely return without mutating
-  return { run: existingRun, status: 200 as const };
-}
-
-// Cross-process event emitter using Upstash Redis Pub/Sub with in-memory fallback
-export type RunEvent =
-  | { seq?: number; type: "delta"; text: string }
-  | {
-      seq?: number;
-      type: "tool_start";
-      toolName: string;
-      toolCallId?: string;
-      stepNumber?: number;
-      input?: any;
-    }
-  | {
-      seq?: number;
-      type: "tool_finish";
-      toolName: string;
-      toolCallId?: string;
-      stepNumber?: number;
-      input?: any;
-      output?: any;
-    }
-  | {
-      seq?: number;
-      type: "status";
-      status: string;
-      output?: any;
-      error?: string;
-      steps?: any[];
-    }
-  | { seq?: number; type: "done"; status: string; output?: any };
-
-type RunEventListener = (event: RunEvent) => void;
-
-class RunEventHub {
-  private localListeners = new Map<string, Set<RunEventListener>>();
-  private nextSeq = 0;
-
-  subscribe(runId: string, listener: RunEventListener): () => void {
-    let lastSeenSeq = -1;
-    const safeListener: RunEventListener = (ev) => {
-      if (ev.seq !== undefined) {
-        if (ev.seq <= lastSeenSeq) return;
-        lastSeenSeq = ev.seq;
-      }
-      listener(ev);
-    };
-
-    let set = this.localListeners.get(runId);
-    if (!set) {
-      set = new Set();
-      this.localListeners.set(runId, set);
-    }
-    set.add(safeListener);
-
-    // Initial replay of stored events from Redis for late-joining subscribers across scale
-    try {
-      const redis = getRedis();
-      if (redis) {
-        const channelKey = `run_events:${runId}`;
-        redis
-          .lrange(channelKey, 0, -1)
-          .then((items) => {
-            if (items && items.length > 0) {
-              for (const item of items) {
-                const parsed: RunEvent =
-                  typeof item === "string" ? JSON.parse(item) : item;
-                safeListener(parsed);
-              }
-            }
-          })
-          .catch(() => {});
-      }
-    } catch {
-      // Redis not configured, fallback to in-process dispatch
-    }
-
-    return () => {
-      set?.delete(safeListener);
-      if (set && set.size === 0) {
-        this.localListeners.delete(runId);
-      }
-    };
-  }
-
-  publish(runId: string, event: RunEvent): void {
-    const eventWithSeq: RunEvent = {
-      ...event,
-      seq: event.seq ?? this.nextSeq++,
-    };
-
-    // 1. Dispatch immediately to in-process listeners with 0ms latency
-    const set = this.localListeners.get(runId);
-    if (set) {
-      for (const listener of set) {
-        try {
-          listener(eventWithSeq);
-        } catch (e) {
-          console.error("Error in run event listener:", e);
-        }
-      }
-    }
-
-    // 2. Persist to Redis list for cross-process subscribers and scaling across instances
-    try {
-      const redis = getRedis();
-      if (redis) {
-        const channelKey = `run_events:${runId}`;
-        const serialized = JSON.stringify(eventWithSeq);
-        redis
-          .rpush(channelKey, serialized)
-          .then(() => redis.expire(channelKey, 3600))
-          .catch(() => {});
-      }
-    } catch {}
-  }
-}
-
-export const runEventHub = new RunEventHub();
-
-export type AgentEvent =
-  | { seq?: number; type: "run_created"; run: any }
-  | {
-      seq?: number;
-      type: "run_status";
-      runId: string;
-      status: string;
-      error?: string;
-      output?: any;
-      conversationId?: string | null;
-    }
-  | {
-      seq?: number;
-      type: "schedule_fired";
-      scheduleId?: string;
-      runId: string;
-      name?: string;
-      prompt?: string;
-      conversationId?: string | null;
-    }
-  | {
-      seq?: number;
-      type: "schedule_updated";
-      scheduleId: string;
-      action: "created" | "updated" | "deleted";
-    };
-
-type AgentEventListener = (event: AgentEvent) => void;
-
-class AgentEventHub {
-  private localListeners = new Map<string, Set<AgentEventListener>>();
-  private nextSeq = 0;
-
-  subscribe(agentId: string, listener: AgentEventListener): () => void {
-    let lastSeenSeq = -1;
-    const safeListener: AgentEventListener = (ev) => {
-      if (ev.seq !== undefined) {
-        if (ev.seq <= lastSeenSeq) return;
-        lastSeenSeq = ev.seq;
-      }
-      listener(ev);
-    };
-
-    let set = this.localListeners.get(agentId);
-    if (!set) {
-      set = new Set();
-      this.localListeners.set(agentId, set);
-    }
-    set.add(safeListener);
-
-    return () => {
-      set?.delete(safeListener);
-      if (set && set.size === 0) {
-        this.localListeners.delete(agentId);
-      }
-    };
-  }
-
-  publish(agentId: string, event: AgentEvent): void {
-    const eventWithSeq: AgentEvent = {
-      ...event,
-      seq: event.seq ?? this.nextSeq++,
-    };
-
-    const set = this.localListeners.get(agentId);
-    if (set) {
-      for (const listener of set) {
-        try {
-          listener(eventWithSeq);
-        } catch (e) {
-          console.error("Error in agent event listener:", e);
-        }
-      }
-    }
-
-    try {
-      const redis = getRedis();
-      if (redis) {
-        const channelKey = `agent_events:${agentId}`;
-        const serialized = JSON.stringify(eventWithSeq);
-        redis
-          .rpush(channelKey, serialized)
-          .then(() => redis.expire(channelKey, 1800))
-          .catch(() => {});
-      }
-    } catch {}
-  }
-}
-
-export const agentEventHub = new AgentEventHub();
-
-export type DirectRunExecutor = (runId: string) => Promise<any>;
-let directRunExecutor: DirectRunExecutor | null = null;
-
-export function registerDirectRunExecutor(executor: DirectRunExecutor) {
-  directRunExecutor = executor;
-}
-
-export function getDirectRunExecutor(): DirectRunExecutor | null {
-  return directRunExecutor;
+  return { run: existingRun, status: 200 as const }
 }

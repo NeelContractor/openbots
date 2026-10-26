@@ -1,7 +1,5 @@
-"use client";
+"use client"
 
-import { Avatar, AvatarFallback } from "@openbots/ui/components/avatar";
-import { Button } from "@openbots/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,25 +9,19 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@openbots/ui/components/dropdown-menu";
+} from "@openbots/ui/components/dropdown-menu"
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@openbots/ui/components/sidebar";
+} from "@openbots/ui/components/sidebar"
+import Avatar from "boring-avatars"
+import { useTheme } from "next-themes"
+import * as React from "react"
 import {
-  IconCheck,
-  IconDeviceLaptop,
-  IconLogout,
-  IconMoon,
-  IconPlug,
-  IconSettings,
-  IconSun,
-} from "@tabler/icons-react";
-import { useTheme } from "next-themes";
-import * as React from "react";
-import {
+  Calendar,
+  Calendar2Newicons,
   Check,
   ChevronDown,
   Devices,
@@ -37,17 +29,19 @@ import {
   Moon3,
   Plug2,
   Setting,
+  SidebarBottom,
   Sun2,
-} from "reicon-react";
-import { SettingsSheet } from "./settings-sheet";
+} from "reicon-react"
+import { AllSchedulesDialog } from "@/modules/schedules/components/all-schedules-dialog"
+import { SettingsSheet } from "./settings-sheet"
 
 interface UserMenuProps {
-  name: string;
-  email?: string;
-  initials: string;
-  onSettings?: () => void;
-  onConnections?: () => void;
-  onSignOut: () => void;
+  name: string
+  email?: string
+  initials: string
+  onSettings?: () => void
+  onConnections?: () => void
+  onSignOut: () => void
 }
 
 export function UserMenu({
@@ -58,69 +52,65 @@ export function UserMenu({
   onConnections,
   onSignOut,
 }: UserMenuProps) {
-  const { isMobile } = useSidebar();
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const { isMobile } = useSidebar()
+  const { theme, setTheme, resolvedTheme } = useTheme()
+  const [settingsOpen, setSettingsOpen] = React.useState(false)
+  const [schedulesOpen, setSchedulesOpen] = React.useState(false)
 
   const handleSettingsClick = () => {
     if (onSettings) {
-      onSettings();
+      onSettings()
     } else {
-      setSettingsOpen(true);
+      setSettingsOpen(true)
     }
-  };
+  }
 
   return (
-    <SidebarMenu className="min-w-0 flex-1 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:p-2">
+    <SidebarMenu className="min-w-0 flex-1 gap-2 group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:p-2">
+      <SidebarMenuItem>
+        <SidebarMenuButton onClick={() => setSchedulesOpen(true)}>
+          <Calendar2Newicons className="opacity-60" />
+          Schedules
+        </SidebarMenuButton>
+      </SidebarMenuItem>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
               <SidebarMenuButton
-                className="w-full py-2! group-data-[collapsible=icon]:rounded-full"
+                className="h-9 w-full group-data-[collapsible=icon]:rounded-full"
                 size="lg"
               />
             }
           >
-            <Avatar className="size-8 shrink-0 group-data-[collapsible=icon]:size-8">
-              <AvatarFallback className="bg-sidebar-accent text-xs font-semibold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+            <Avatar
+              className="size-6! group-data-[collapsible=icon]:size-8!"
+              name={name}
+              variant="pixel"
+            />
 
             <span className="min-w-0 flex-1 text-left group-data-[collapsible=icon]:hidden">
-              <span className="block max-w-20 truncate text-[13px] font-medium">
+              <span className="block max-w-30 truncate text-sm font-medium">
                 {name}
               </span>
-              <span className="block truncate text-[11px] text-muted-foreground">
-                {email}
-              </span>
             </span>
-            <ChevronDown className="ml-auto size-4 text-sidebar-accent-foreground/50" />
+            <ChevronDown className="ml-auto size-3! text-sidebar-accent-foreground/50" />
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={8}
-            className="min-w-56 rounded-xl"
+            className="min-w-56"
           >
             <div className="flex items-center gap-2 px-2 py-1.5">
-              <Avatar className="size-8">
-                <AvatarFallback className="bg-sidebar-accent text-xs font-semibold">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+              <Avatar className="size-7!" name={name} variant="pixel" />
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{name}</p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {email}
-                </p>
+                <p className="truncate text-xs">{email}</p>
               </div>
             </div>
-
             <DropdownMenuSeparator />
-
             {onConnections && (
               <DropdownMenuItem onClick={onConnections}>
                 <Plug2 />
@@ -133,21 +123,21 @@ export function UserMenu({
                 {resolvedTheme === "dark" ? <Moon3 /> : <Sun2 />}
                 Theme
               </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className="min-w-36 rounded-xl">
+              <DropdownMenuSubContent className="min-w-36">
                 <DropdownMenuItem onClick={() => setTheme("light")}>
                   <Sun2 />
                   Light
-                  {theme === "light" && <Check className="ml-auto size-4" />}
+                  {theme === "light" && <Check className="ml-auto size-3.5" />}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("dark")}>
                   <Moon3 />
                   Dark
-                  {theme === "dark" && <Check className="ml-auto size-4" />}
+                  {theme === "dark" && <Check className="ml-auto size-3.5" />}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("system")}>
                   <Devices />
                   System
-                  {theme === "system" && <Check className="ml-auto size-4" />}
+                  {theme === "system" && <Check className="ml-auto size-3.5" />}
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
@@ -166,6 +156,10 @@ export function UserMenu({
       </SidebarMenuItem>
 
       <SettingsSheet open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <AllSchedulesDialog
+        open={schedulesOpen}
+        onOpenChange={setSchedulesOpen}
+      />
     </SidebarMenu>
-  );
+  )
 }

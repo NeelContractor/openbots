@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import { Spinner } from "@openbots/ui/components/spinner";
-import { cn } from "@openbots/ui/lib/utils";
+import { Spinner } from "@openbots/ui/components/spinner"
+import { cn } from "@openbots/ui/lib/utils"
 
 interface LoadingStateProps {
-  label?: string;
-  className?: string;
+  label?: string
+  className?: string
 }
 
 export function LoadingState({ label, className }: LoadingStateProps) {
@@ -19,5 +19,5 @@ export function LoadingState({ label, className }: LoadingStateProps) {
       <Spinner className="size-6 text-muted-foreground" />
       {label && <p className="hidden text-xs">{label}</p>}
     </div>
-  );
+  )
 }

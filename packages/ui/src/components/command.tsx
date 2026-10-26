@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   Dialog,
@@ -6,15 +6,16 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@openbots/ui/components/dialog";
+} from "@openbots/ui/components/dialog"
 import {
   InputGroup,
   InputGroupAddon,
-} from "@openbots/ui/components/input-group";
-import { Command as CommandPrimitive } from "cmdk";
-import { cn } from "cn";
-import { CheckIcon, SearchIcon } from "lucide-react";
-import type * as React from "react";
+  InputGroupInput,
+} from "@openbots/ui/components/input-group"
+import { Command as CommandPrimitive } from "cmdk"
+import { cn } from "cn"
+import { CheckIcon, SearchIcon } from "lucide-react"
+import type * as React from "react"
 
 function Command({
   className,
@@ -29,7 +30,7 @@ function Command({
       )}
       {...props}
     />
-  );
+  )
 }
 
 function CommandDialog({
@@ -40,11 +41,11 @@ function CommandDialog({
   showCloseButton = false,
   ...props
 }: Omit<React.ComponentProps<typeof Dialog>, "children"> & {
-  title?: string;
-  description?: string;
-  className?: string;
-  showCloseButton?: boolean;
-  children: React.ReactNode;
+  title?: string
+  description?: string
+  className?: string
+  showCloseButton?: boolean
+  children: React.ReactNode
 }) {
   return (
     <Dialog {...props}>
@@ -54,7 +55,7 @@ function CommandDialog({
       </DialogHeader>
       <DialogContent
         className={cn(
-          "top-1/2 h-130! max-w-xl! overflow-hidden rounded-xl! p-1 transition-none!",
+          "top-1/2 h-130! w-full max-w-[calc(100%-2rem)] overflow-hidden rounded-xl! p-1 transition-none! sm:max-w-xl",
           className,
         )}
         showCloseButton={showCloseButton}
@@ -64,7 +65,7 @@ function CommandDialog({
         </Command>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 
 function CommandInput({
@@ -73,8 +74,8 @@ function CommandInput({
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
     <div data-slot="command-input-wrapper" className="rounded-lg! p-1">
-      <InputGroup className="h-9! rounded-lg! border-input/30 bg-input/30 shadow-none! ring-border focus-within:ring-2 *:data-[slot=input-group-addon]:pl-2!">
-        <CommandPrimitive.Input
+      <InputGroup className="h-9! rounded-lg! border-border bg-muted shadow-none! ring-border focus-within:border-foreground/30 focus-within:ring-3 *:data-[slot=input-group-addon]:pl-2!">
+        <InputGroupInput
           data-slot="command-input"
           className={cn(
             "w-full text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
@@ -87,7 +88,7 @@ function CommandInput({
         </InputGroupAddon>
       </InputGroup>
     </div>
-  );
+  )
 }
 
 function CommandList({
@@ -103,7 +104,7 @@ function CommandList({
       )}
       {...props}
     />
-  );
+  )
 }
 
 function CommandEmpty({
@@ -116,7 +117,7 @@ function CommandEmpty({
       className={cn("py-6 text-center text-sm", className)}
       {...props}
     />
-  );
+  )
 }
 
 function CommandGroup({
@@ -132,7 +133,7 @@ function CommandGroup({
       )}
       {...props}
     />
-  );
+  )
 }
 
 function CommandSeparator({
@@ -145,7 +146,7 @@ function CommandSeparator({
       className={cn("-mx-1 h-px w-auto bg-border", className)}
       {...props}
     />
-  );
+  )
 }
 
 function CommandItem({
@@ -165,7 +166,7 @@ function CommandItem({
       {children}
       <CheckIcon className="ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" />
     </CommandPrimitive.Item>
-  );
+  )
 }
 
 function CommandShortcut({
@@ -181,7 +182,7 @@ function CommandShortcut({
       )}
       {...props}
     />
-  );
+  )
 }
 
 export {
@@ -194,4 +195,4 @@ export {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-};
+}

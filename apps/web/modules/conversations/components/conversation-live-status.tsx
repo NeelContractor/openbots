@@ -8,13 +8,13 @@ import {
 } from "@openbots/ui/components/marker"
 import {
   Message,
+  MessageAvatar,
   MessageContent,
-  MessageFooter,
-  MessageGroup,
 } from "@openbots/ui/components/message"
+import { Spinner } from "@openbots/ui/components/spinner"
 import { Blobatar } from "@openbots/ui/components/ui/blobatar"
 import { IconAlertCircle, IconPlayerStop } from "@tabler/icons-react"
-import { ExecutionStepsCard } from "@/modules/runs/components/execution-steps-card"
+import { formatToolStepLabel } from "@/modules/runs/tool-label"
 import type { RunRecord, StepItem } from "@/modules/runs/types"
 
 interface ConversationLiveStatusProps {
@@ -33,45 +33,56 @@ export function ConversationLiveStatus({
   hasStreamingContent = false,
 }: ConversationLiveStatusProps) {
   if (isActiveRunOngoing) {
-    if (activeRunSteps.length === 0 && hasStreamingContent) {
-      return null
-    }
+    // Find the latest active or completed tool step to display minimally
+    const latestToolStep = [...activeRunSteps]
+      .reverse()
+      .find((s) => s.type === "tool" || Boolean(s.toolName))
+
+    const latestToolLabel = latestToolStep
+      ? formatToolStepLabel(
+          latestToolStep.toolName,
+          latestToolStep.status,
+          latestToolStep.toolInput,
+          latestToolStep.toolOutput,
+        ).label
+      : null
+
+    const isLatestToolRunning = latestToolStep?.status === "running"
+
     return (
-      <div className="space-y-3 py-1">
-        {activeRunSteps.length > 0 && (
-          <ExecutionStepsCard
-            steps={activeRunSteps}
-            isLive={isActiveRunOngoing}
+      <Message align="start" className="gap-2">
+        <MessageAvatar className="-mr-0.5">
+          <Blobatar
+            name={agentName}
+            className="size-8"
+            blobatar={{ animate: "always" }}
           />
-        )}
-
-        {!hasStreamingContent && (
-          <MessageGroup className="-mt-6">
-            <Message align="start" className="gap-2">
-              <MessageContent>
-                <Bubble variant="secondary" align="start">
-                  <BubbleContent className="flex items-center gap-1.5 px-3 py-2 text-foreground">
-                    <span className="size-1.5 animate-bounce rounded-full bg-foreground/60 [animation-delay:-0.3s]" />
-                    <span className="size-1.5 animate-bounce rounded-full bg-foreground/60 [animation-delay:-0.15s]" />
-                    <span className="size-1.5 animate-bounce rounded-full bg-foreground/60" />
-                  </BubbleContent>
-                </Bubble>
-
-                <MessageFooter className="gap-px px-0">
-                  <Blobatar
-                    name={agentName}
-                    className="size-6 shrink-0"
-                    blobatar={{ animate: "always" }}
-                  />
-                  <span className="shimmer text-xs font-medium">
-                    {agentName}
-                  </span>
-                </MessageFooter>
-              </MessageContent>
-            </Message>
-          </MessageGroup>
-        )}
-      </div>
+        </MessageAvatar>
+        <MessageContent className="gap-2">
+          <Bubble variant="secondary" align="start">
+            <BubbleContent>
+              {latestToolLabel && isLatestToolRunning ? (
+                <Marker className="text-xs text-muted-foreground">
+                  <MarkerIcon className="flex items-center justify-center">
+                    <Spinner className="size-3" />
+                  </MarkerIcon>
+                  <MarkerContent className="shimmer font-medium">
+                    {latestToolLabel}
+                  </MarkerContent>
+                </Marker>
+              ) : (
+                <Marker className="text-xs text-muted-foreground">
+                  <MarkerContent className="flex items-center gap-2 py-0">
+                    <div className="animate-bounce-pulse size-1.5 rounded-full bg-foreground/30 delay-75" />
+                    <div className="animate-bounce-pulse size-1.5 rounded-full bg-foreground/30 delay-150" />
+                    <div className="animate-bounce-pulse size-1.5 rounded-full bg-foreground/30 delay-200" />
+                  </MarkerContent>
+                </Marker>
+              )}
+            </BubbleContent>
+          </Bubble>
+        </MessageContent>
+      </Message>
     )
   }
 
@@ -82,22 +93,13 @@ export function ConversationLiveStatus({
     return (
       <div className="py-1">
         {activeRun.status === "failed" && activeRun.error && (
-          <Marker className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-xs text-destructive">
+          <Marker variant="border" className="text-xs text-destructive">
             <MarkerIcon>
               <IconAlertCircle className="size-4 shrink-0 text-destructive" />
             </MarkerIcon>
-            <MarkerContent className="font-mono text-[11px] leading-relaxed">
+            <MarkerContent className="font-mono text-xs leading-relaxed">
               {activeRun.error}
             </MarkerContent>
-          </Marker>
-        )}
-
-        {activeRun.status === "cancelled" && (
-          <Marker className="text-xs text-muted-foreground">
-            <MarkerIcon>
-              <IconPlayerStop className="size-3.5" />
-            </MarkerIcon>
-            <MarkerContent>The run was halted safely.</MarkerContent>
           </Marker>
         )}
       </div>

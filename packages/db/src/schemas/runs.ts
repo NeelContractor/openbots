@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations } from "drizzle-orm"
 import {
   index,
   jsonb,
@@ -7,11 +7,11 @@ import {
   text,
   timestamp,
   uuid,
-} from "drizzle-orm/pg-core";
-import { agents } from "./agents.js";
-import { user } from "./auth.js";
-import { conversations } from "./conversations.js";
-import { runSteps } from "./run-steps.js";
+} from "drizzle-orm/pg-core"
+import { agents } from "./agents.js"
+import { user } from "./auth.js"
+import { conversations } from "./conversations.js"
+import { runSteps } from "./run-steps.js"
 
 export const runStatusEnum = pgEnum("run_status", [
   "queued",
@@ -20,14 +20,14 @@ export const runStatusEnum = pgEnum("run_status", [
   "completed",
   "failed",
   "cancelled",
-]);
+])
 
 export const runTriggerTypeEnum = pgEnum("run_trigger_type", [
   "manual",
   "schedule",
   "event",
   "webhook",
-]);
+])
 
 export const runs = pgTable(
   "runs",
@@ -60,7 +60,7 @@ export const runs = pgTable(
     index("runs_status_idx").on(table.status),
     index("runs_created_at_idx").on(table.createdAt),
   ],
-);
+)
 
 export const runsRelations = relations(runs, ({ one, many }) => ({
   user: one(user, {
@@ -76,7 +76,7 @@ export const runsRelations = relations(runs, ({ one, many }) => ({
     references: [conversations.id],
   }),
   steps: many(runSteps),
-}));
+}))
 
-export type Run = typeof runs.$inferSelect;
-export type NewRun = typeof runs.$inferInsert;
+export type Run = typeof runs.$inferSelect
+export type NewRun = typeof runs.$inferInsert

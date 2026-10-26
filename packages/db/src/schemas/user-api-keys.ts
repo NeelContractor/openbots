@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations } from "drizzle-orm"
 import {
   index,
   pgTable,
@@ -6,8 +6,8 @@ import {
   timestamp,
   unique,
   uuid,
-} from "drizzle-orm/pg-core";
-import { user } from "./auth.js";
+} from "drizzle-orm/pg-core"
+import { user } from "./auth.js"
 
 export const userApiKeys = pgTable(
   "user_api_keys",
@@ -36,14 +36,14 @@ export const userApiKeys = pgTable(
       table.provider,
     ),
   ],
-);
+)
 
 export const userApiKeysRelations = relations(userApiKeys, ({ one }) => ({
   user: one(user, {
     fields: [userApiKeys.userId],
     references: [user.id],
   }),
-}));
+}))
 
-export type UserApiKey = typeof userApiKeys.$inferSelect;
-export type NewUserApiKey = typeof userApiKeys.$inferInsert;
+export type UserApiKey = typeof userApiKeys.$inferSelect
+export type NewUserApiKey = typeof userApiKeys.$inferInsert

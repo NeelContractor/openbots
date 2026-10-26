@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   AlertDialog,
@@ -9,20 +9,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@openbots/ui/components/alert-dialog";
-import { Spinner } from "@openbots/ui/components/spinner";
-import type * as React from "react";
+} from "@openbots/ui/components/alert-dialog"
+import { Spinner } from "@openbots/ui/components/spinner"
+import type * as React from "react"
 
 interface ConfirmDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: string;
-  description: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  variant?: "default" | "destructive";
-  isLoading?: boolean;
-  onConfirm: () => void | Promise<void>;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title: string
+  description: string
+  confirmLabel?: string
+  cancelLabel?: string
+  variant?: "default" | "destructive"
+  isLoading?: boolean
+  onConfirm: () => void | Promise<void>
 }
 
 export function ConfirmDialog({
@@ -37,9 +37,9 @@ export function ConfirmDialog({
   onConfirm,
 }: ConfirmDialogProps) {
   const handleConfirm = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    await onConfirm();
-  };
+    e.preventDefault()
+    await onConfirm()
+  }
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -63,5 +63,5 @@ export function ConfirmDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
+  )
 }

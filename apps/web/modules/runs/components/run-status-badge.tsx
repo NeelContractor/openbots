@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import { Spinner } from "@openbots/ui/components/spinner";
-import type { RunStatus } from "../types";
+import { Spinner } from "@openbots/ui/components/spinner"
+import type { RunStatus } from "../types"
 
 const STATUS_META: Record<
   RunStatus,
@@ -33,14 +33,14 @@ const STATUS_META: Record<
     dot: "bg-destructive",
     text: "text-destructive",
   },
-};
+}
 
 export function RunStatusBadge({ status }: { status: RunStatus }) {
   const meta = STATUS_META[status] ?? {
     label: status,
     dot: "bg-muted-foreground/50",
     text: "text-muted-foreground",
-  };
+  }
 
   return (
     <span
@@ -53,5 +53,5 @@ export function RunStatusBadge({ status }: { status: RunStatus }) {
       )}
       {meta.label}
     </span>
-  );
+  )
 }

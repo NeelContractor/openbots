@@ -1,2 +1,2 @@
-export type { Redis } from "./client"
-export { getRedis } from "./client"
+export type { Redis } from "./client.js"
+export { getRedis } from "./client.js"

@@ -1,6 +1,6 @@
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle } from "drizzle-orm/postgres-js"
 import postgres from "postgres"
-import * as schema from "./schemas/index.js";
+import * as schema from "./schemas/index.js"
 
 function getDatabaseUrl(): string {
   return (
@@ -9,8 +9,8 @@ function getDatabaseUrl(): string {
   )
 }
 
-// prepase: false is required for Supabase transaction pooler (port 6543)
-const client = postgres(getDatabaseUrl(), { prepare: false });
+// prepare: false is required for Supabase transaction pooler (port 6543)
+const client = postgres(getDatabaseUrl(), { prepare: false })
 
-export const db = drizzle(client, { schema });
-export type Database = typeof db;
+export const db = drizzle(client, { schema })
+export type Database = typeof db

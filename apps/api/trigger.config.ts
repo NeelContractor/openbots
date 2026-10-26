@@ -1,5 +1,5 @@
-import { defineConfig } from "@trigger.dev/sdk";
-import { aptGet } from "@trigger.dev/build/extensions/core";
+import { aptGet } from "@trigger.dev/build/extensions/core"
+import { defineConfig } from "@trigger.dev/sdk"
 
 export default defineConfig({
   project: process.env.TRIGGER_PROJECT_REF ?? "",
@@ -18,8 +18,9 @@ export default defineConfig({
   },
   dirs: ["./src/trigger"],
   build: {
+    external: ["playwright-core", "chromium-bidi"],
     extensions: [
       aptGet({ packages: ["git", "curl", "jq", "python3", "ripgrep"] }),
     ],
   },
-});
+})

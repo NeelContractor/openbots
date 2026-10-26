@@ -1,13 +1,6 @@
-"use client";
+"use client"
 
-import { Badge } from "@openbots/ui/components/badge";
-import { Button } from "@openbots/ui/components/button";
-import { Field, FieldGroup, FieldLabel } from "@openbots/ui/components/field";
-import { Input } from "@openbots/ui/components/input";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@openbots/ui/components/native-select";
+import { Button } from "@openbots/ui/components/button"
 import {
   Sheet,
   SheetContent,
@@ -15,128 +8,114 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from "@openbots/ui/components/sheet";
-import { Spinner } from "@openbots/ui/components/spinner";
-import { Switch } from "@openbots/ui/components/switch";
+} from "@openbots/ui/components/sheet"
+import { Spinner } from "@openbots/ui/components/spinner"
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@openbots/ui/components/tabs";
-import { Textarea } from "@openbots/ui/components/textarea";
-import { IconCheck, IconTrash } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
-import * as React from "react";
-import { TOOL_DESCRIPTIONS } from "../constants";
+} from "@openbots/ui/components/tabs"
+import { IconTrash } from "@tabler/icons-react"
+import { useQueryClient } from "@tanstack/react-query"
+import * as React from "react"
 import {
   useAgentToolsQuery,
   useAvailableModelsQuery,
   useToggleAgentToolMutation,
   useUpdateAgentMutation,
-} from "../queries";
-import type { Agent } from "../types";
-import { DeleteAgentDialog } from "./delete-agent-dialog";
-import { useRouter } from "next/navigation";
-
-const PROVIDER_LABELS: Record<string, string> = {
-  google: "Google Gemini",
-  openai: "OpenAI",
-  anthropic: "Anthropic Claude",
-  deepseek: "DeepSeek",
-  groq: "Groq",
-  xai: "xAI Grok",
-  openrouter: "OpenRouter",
-};
+} from "../queries"
+import type { Agent } from "../types"
+import { ConfigureAgentGeneralTab } from "./configure-agent-general-tab"
+import { ConfigureAgentToolsTab } from "./configure-agent-tools-tab"
+import { DeleteAgentDialog } from "./delete-agent-dialog"
 
 interface ConfigureAgentSheetProps {
-  agent: Agent | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  agent: Agent | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 const SCROLL_CLASS =
   "min-h-0 flex-1 overflow-y-auto overscroll-contain " +
   "[scrollbar-gutter:stable] [scrollbar-width:thin] " +
-  "[scrollbar-color:color-mix(in_oklab,currentColor_25%,transparent)_transparent]";
+  "[scrollbar-color:color-mix(in_oklab,currentColor_25%,transparent)_transparent]"
 
 export function ConfigureAgentSheet({
   agent,
   open,
   onOpenChange,
 }: ConfigureAgentSheetProps) {
-  const [name, setName] = React.useState("");
-  const [description, setDescription] = React.useState("");
-  const [instructions, setInstructions] = React.useState("");
-  const [model, setModel] = React.useState("google/gemini-2.5-flash");
-  const [maxSteps, setMaxSteps] = React.useState(25);
-  const [saveSuccess, setSaveSuccess] = React.useState(false);
-  const [saveError, setSaveError] = React.useState<string | null>(null);
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = React.useState(false);
+  const [name, setName] = React.useState("")
+  const [description, setDescription] = React.useState("")
+  const [instructions, setInstructions] = React.useState("")
+  const [model, setModel] = React.useState("google/gemini-2.5-flash")
+  const [saveSuccess, setSaveSuccess] = React.useState(false)
+  const [saveError, setSaveError] = React.useState<string | null>(null)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = React.useState(false)
 
   const [selectedProvider, setSelectedProvider] =
-    React.useState<string>("google");
+    React.useState<string>("google")
 
-  const { data: availableModels = [] } = useAvailableModelsQuery(open);
+  const { data: availableModels = [] } = useAvailableModelsQuery(open)
 
   // Group models by provider
   const modelsByProvider = React.useMemo(() => {
-    const groups: Record<string, typeof availableModels> = {};
+    const groups: Record<string, typeof availableModels> = {}
     for (const m of availableModels) {
-      const p = m.provider || m.id.split("/")[0] || "other";
-      if (!groups[p]) groups[p] = [];
-      groups[p].push(m);
+      const p = m.provider || m.id.split("/")[0] || "other"
+      if (!groups[p]) groups[p] = []
+      groups[p].push(m)
     }
-    return groups;
-  }, [availableModels]);
+    return groups
+  }, [availableModels])
 
-  const providerKeys = Object.keys(modelsByProvider);
+  const providerKeys = Object.keys(modelsByProvider)
 
   const { data: tools = [], isLoading: isLoadingTools } = useAgentToolsQuery(
     agent?.id,
     open,
-  );
+  )
 
-  const queryClient = useQueryClient();
-  const updateMutation = useUpdateAgentMutation(agent?.id);
-  const toggleToolMutation = useToggleAgentToolMutation(agent?.id);
+  const queryClient = useQueryClient()
+  const updateMutation = useUpdateAgentMutation(agent?.id)
+  const toggleToolMutation = useToggleAgentToolMutation(agent?.id)
 
   React.useEffect(() => {
     if (agent) {
-      setName(agent.name);
-      setDescription(agent.description || "");
-      setInstructions(agent.instructions);
-      setModel(agent.model);
-      const agentProvider = agent.model.split("/")[0] || "google";
-      setSelectedProvider(agentProvider);
-      setMaxSteps(agent.maxSteps || 25);
-      setSaveSuccess(false);
-      setSaveError(null);
+      setName(agent.name)
+      setDescription(agent.description || "")
+      setInstructions(agent.instructions)
+      setModel(agent.model)
+      const agentProvider = agent.model.split("/")[0] || "google"
+      setSelectedProvider(agentProvider)
+      setSaveSuccess(false)
+      setSaveError(null)
     }
-  }, [agent]);
+  }, [agent])
 
   // Sync selectedProvider if not present
   React.useEffect(() => {
     if (providerKeys.length > 0 && !modelsByProvider[selectedProvider]) {
-      setSelectedProvider(providerKeys[0] || "");
+      setSelectedProvider(providerKeys[0] || "")
     }
-  }, [providerKeys, selectedProvider, modelsByProvider]);
+  }, [providerKeys, selectedProvider, modelsByProvider])
 
   // Sync model with selectedProvider
-  const currentProviderModels = modelsByProvider[selectedProvider] || [];
+  const currentProviderModels = modelsByProvider[selectedProvider] || []
   React.useEffect(() => {
     if (currentProviderModels.length > 0) {
-      const hasCurrent = currentProviderModels.some((m) => m.id === model);
+      const hasCurrent = currentProviderModels.some((m) => m.id === model)
       if (!hasCurrent && currentProviderModels[0]) {
-        setModel(currentProviderModels[0].id);
+        setModel(currentProviderModels[0].id)
       }
     }
-  }, [selectedProvider, currentProviderModels, model]);
+  }, [selectedProvider, currentProviderModels, model])
 
   const handleUpdate = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaveError(null);
-    setSaveSuccess(false);
+    e.preventDefault()
+    setSaveError(null)
+    setSaveSuccess(false)
 
     updateMutation.mutate(
       {
@@ -144,25 +123,24 @@ export function ConfigureAgentSheet({
         description: description.trim() || undefined,
         instructions: instructions.trim(),
         model,
-        maxSteps: Number(maxSteps) || 25,
       },
       {
         onSuccess: () => {
-          setSaveSuccess(true);
-          setTimeout(() => setSaveSuccess(false), 2500);
+          setSaveSuccess(true)
+          setTimeout(() => setSaveSuccess(false), 2500)
         },
         onError: (err) => {
-          setSaveError(err.message);
+          setSaveError(err.message)
         },
       },
-    );
-  };
+    )
+  }
 
-  if (!agent) return null;
+  if (!agent) return null
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right">
+      <SheetContent side="left">
         <SheetHeader>
           <SheetTitle>Configure agent</SheetTitle>
           <SheetDescription>
@@ -183,185 +161,32 @@ export function ConfigureAgentSheet({
           </TabsList>
 
           <TabsContent value="general" className={SCROLL_CLASS}>
-            <form
-              id="configure-agent-form"
+            <ConfigureAgentGeneralTab
+              name={name}
+              setName={setName}
+              description={description}
+              setDescription={setDescription}
+              instructions={instructions}
+              setInstructions={setInstructions}
+              model={model}
+              setModel={setModel}
+              selectedProvider={selectedProvider}
+              setSelectedProvider={setSelectedProvider}
+              providerKeys={providerKeys}
+              modelsByProvider={modelsByProvider}
+              currentProviderModels={currentProviderModels}
+              saveSuccess={saveSuccess}
+              saveError={saveError}
               onSubmit={handleUpdate}
-              className="space-y-4 pb-4"
-            >
-              {saveSuccess && (
-                <div className="flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-2.5 text-xs text-emerald-600 dark:text-emerald-400">
-                  <IconCheck className="size-3.5" />
-                  Configuration saved.
-                </div>
-              )}
-
-              {saveError && (
-                <div className="rounded-xl border border-destructive/20 bg-destructive/5 px-3.5 py-2.5 text-xs text-destructive">
-                  {saveError}
-                </div>
-              )}
-
-              <FieldGroup className="gap-4">
-                <Field>
-                  <FieldLabel htmlFor="cfg-name">Agent name</FieldLabel>
-                  <Input
-                    id="cfg-name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="cfg-desc">Description</FieldLabel>
-                  <Input
-                    id="cfg-desc"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Optional description"
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="cfg-instructions">
-                    System instructions
-                  </FieldLabel>
-                  <Textarea
-                    id="cfg-instructions"
-                    rows={8}
-                    className="max-h-40 font-mono text-xs"
-                    value={instructions}
-                    onChange={(e) => setInstructions(e.target.value)}
-                    required
-                  />
-                </Field>
-
-                {providerKeys.length === 0 ? (
-                  <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-600 dark:text-amber-400">
-                    No LLM API keys configured yet. Please configure a provider
-                    in Settings &gt; API Keys.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    <Field>
-                      <FieldLabel htmlFor="cfg-provider">Provider</FieldLabel>
-                      <NativeSelect
-                        id="cfg-provider"
-                        value={selectedProvider}
-                        onChange={(e) => {
-                          const newP = e.target.value;
-                          setSelectedProvider(newP);
-                          const firstModel = modelsByProvider[newP]?.[0]?.id;
-                          if (firstModel) setModel(firstModel);
-                        }}
-                        className="w-full text-xs"
-                      >
-                        {providerKeys.map((p) => (
-                          <NativeSelectOption key={p} value={p}>
-                            {PROVIDER_LABELS[p] || p.toUpperCase()}
-                          </NativeSelectOption>
-                        ))}
-                      </NativeSelect>
-                    </Field>
-
-                    <Field>
-                      <FieldLabel htmlFor="cfg-model">Model</FieldLabel>
-                      <NativeSelect
-                        id="cfg-model"
-                        value={model}
-                        onChange={(e) => setModel(e.target.value)}
-                        className="w-full text-xs"
-                      >
-                        {currentProviderModels.map((m) => (
-                          <NativeSelectOption key={m.id} value={m.id}>
-                            {m.displayName}
-                          </NativeSelectOption>
-                        ))}
-                      </NativeSelect>
-                    </Field>
-                  </div>
-                )}
-
-                <Field>
-                  <FieldLabel htmlFor="cfg-steps">Max steps</FieldLabel>
-                  <Input
-                    id="cfg-steps"
-                    type="number"
-                    min={1}
-                    max={50}
-                    value={maxSteps}
-                    onChange={(e) => setMaxSteps(Number(e.target.value))}
-                  />
-                </Field>
-              </FieldGroup>
-            </form>
+            />
           </TabsContent>
 
           <TabsContent value="tools" className={SCROLL_CLASS}>
-            <div className="space-y-3 pb-4">
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                Choose which tools the agent can call during its multi-step
-                loop.
-              </p>
-
-              {isLoadingTools ? (
-                <div className="flex items-center justify-center p-8">
-                  <Spinner className="size-5" />
-                </div>
-              ) : tools.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border px-4 py-8 text-center text-xs text-muted-foreground">
-                  No tools available for this agent yet.
-                </div>
-              ) : (
-                <div className="divide-y divide-border overflow-hidden rounded-xl border border-border">
-                  {tools.map((tool) => {
-                    const rowPending =
-                      toggleToolMutation.isPending &&
-                      toggleToolMutation.variables?.toolName === tool.toolName;
-
-                    return (
-                      <div
-                        key={tool.id}
-                        className="flex items-center gap-3 px-3.5 py-3"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="truncate font-mono text-xs font-medium text-foreground">
-                              {tool.toolName}
-                            </span>
-                            <Badge
-                              variant="outline"
-                              className="h-4 shrink-0 py-0 text-[10px] text-muted-foreground"
-                            >
-                              {tool.provider}
-                            </Badge>
-                          </div>
-                          <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-                            {TOOL_DESCRIPTIONS[tool.toolName] ??
-                              `External ${tool.provider} tool integration.`}
-                          </p>
-                        </div>
-
-                        <div className="flex shrink-0 items-center gap-2">
-                          {rowPending && <Spinner className="size-3" />}
-                          <Switch
-                            checked={tool.enabled}
-                            onCheckedChange={(checked) =>
-                              toggleToolMutation.mutate({
-                                toolName: tool.toolName,
-                                provider: tool.provider,
-                                enabled: checked,
-                              })
-                            }
-                            disabled={rowPending}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            <ConfigureAgentToolsTab
+              tools={tools}
+              isLoadingTools={isLoadingTools}
+              toggleToolMutation={toggleToolMutation}
+            />
           </TabsContent>
         </Tabs>
 
@@ -390,25 +215,25 @@ export function ConfigureAgentSheet({
             open={deleteConfirmOpen}
             onOpenChange={setDeleteConfirmOpen}
             onSuccess={(id) => {
-              queryClient.invalidateQueries({ queryKey: ["agents"] });
-              queryClient.removeQueries({ queryKey: ["agent", id] });
+              queryClient.invalidateQueries({ queryKey: ["agents"] })
+              queryClient.removeQueries({ queryKey: ["agent", id] })
               queryClient.setQueryData(["agents"], (old: any) => {
                 if (Array.isArray(old)) {
-                  return old.filter((a: Agent) => a.id !== id);
+                  return old.filter((a: Agent) => a.id !== id)
                 }
                 if (old?.agents) {
                   return {
                     ...old,
                     agents: old.agents.filter((a: Agent) => a.id !== id),
-                  };
+                  }
                 }
-                return old;
-              });
-              onOpenChange(false);
+                return old
+              })
+              onOpenChange(false)
             }}
           />
         </SheetFooter>
       </SheetContent>
     </Sheet>
-  );
+  )
 }

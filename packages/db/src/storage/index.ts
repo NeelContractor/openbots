@@ -2,26 +2,26 @@ import type {
   FileOptions,
   SearchOptions,
   StorageError,
-} from "@supabase/storage-js";
+} from "@supabase/storage-js"
 import { createClient } from "@supabase/supabase-js"
 
 /**
  * Returns a configured Supabase client for storage operations.
- * Reads SUPABASE_URL ans either SUPABASE_ROLE_KEY or SUPABASE_ANON_KEY.
+ * Reads SUPABASE_URL and either SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY.
  *
  * For backend operations requiring administrative access (or bypassing RLS),
  * SUPABASE_SERVICE_ROLE_KEY should be set.
  */
 export function getSupabaseStorageClient() {
-  const url = process.env.SUPABASE_URL;
+  const url = process.env.SUPABASE_URL
   const key =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.SUPABASE_ANON_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!url || !key) {
     throw new Error(
-      "Supabase Storage reuires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_ANON_KEY) environment variables.",
+      "Supabase Storage requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_ANON_KEY) environment variables.",
     )
   }
 
@@ -29,82 +29,82 @@ export function getSupabaseStorageClient() {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
-    }
+    },
   })
 }
 
 export interface UploadStorageFileOptions extends FileOptions {
-  bucket: string;
-  path: string;
+  bucket: string
+  path: string
   fileBody:
-  | ArrayBuffer
-  | ArrayBufferView
-  | Blob
-  | Buffer
-  | File
-  | FormData
-  | NodeJS.ReadableStream
-  | ReadableStream<Uint8Array>
-  | URLSearchParams
-  | string;
+    | ArrayBuffer
+    | ArrayBufferView
+    | Blob
+    | Buffer
+    | File
+    | FormData
+    | NodeJS.ReadableStream
+    | ReadableStream<Uint8Array>
+    | URLSearchParams
+    | string
 }
 
 export interface StorageFileResult {
-  data: { id?: string; path: string; fullPath?: string } | null;
-  error: StorageError | null;
+  data: { id?: string; path: string; fullPath?: string } | null
+  error: StorageError | null
 }
 
 export interface StorageSignedUrlResult {
-  data: { signedUrl: string } | null;
-  error: StorageError | null;
+  data: { signedUrl: string } | null
+  error: StorageError | null
 }
 
 export interface StoragePublicUrlResult {
-  data: { publicUrl: string };
+  data: { publicUrl: string }
 }
 
 export interface StorageDownloadResult {
-  data: Blob | null;
-  error: StorageError | null;
+  data: Blob | null
+  error: StorageError | null
 }
 
 export interface StorageDeleteResult {
-  data: { name: string }[] | null;
-  error: StorageError | null;
+  data: { name: string }[] | null
+  error: StorageError | null
 }
 
 export interface StorageListResult {
   data:
-  | {
-      name: string
-      id: string | null
-      updated_at: string | null
-      created_at: string | null
-      last_accessed_at: string | null
-      metadata: Record<string, unknown> | null;
-    }[]
-  | null;
-  error: StorageError | null;
+    | {
+        name: string
+        id: string | null
+        updated_at: string | null
+        created_at: string | null
+        last_accessed_at: string | null
+        metadata: Record<string, unknown> | null
+      }[]
+    | null
+  error: StorageError | null
 }
 
 /**
- * Upload an object to a Supabase Storage bucket.
+ * Upload an object to a Supabase storage bucket.
  * If `upsert: true` is specified, it will overwrite any existing file at that path.
  */
 export async function uploadStorageObject(
   options: UploadStorageFileOptions,
 ): Promise<StorageFileResult> {
-  const supabase = getSupabaseStorageClient();
-  const { bucket, path, fileBody, ...uploadOptions } = options;
+  const supabase = getSupabaseStorageClient()
+  const { bucket, path, fileBody, ...uploadOptions } = options
 
   const { data, error } = await supabase.storage
     .from(bucket)
     .upload(path, fileBody, {
       upsert: false,
       ...uploadOptions,
-    });
+    })
 
-  return { data, error };
+  return { data, error }
 }
 
 /**
@@ -114,17 +114,17 @@ export async function uploadStorageObject(
 export async function updateStorageObject(
   options: UploadStorageFileOptions,
 ): Promise<StorageFileResult> {
-  const supabase = getSupabaseStorageClient();
-  const { bucket, path, fileBody, ...uploadOptions } = options;
+  const supabase = getSupabaseStorageClient()
+  const { bucket, path, fileBody, ...uploadOptions } = options
 
   const { data, error } = await supabase.storage
     .from(bucket)
     .update(path, fileBody, {
       upsert: true,
       ...uploadOptions,
-    });
+    })
 
-  return { data, error };
+  return { data, error }
 }
 
 /**
@@ -134,9 +134,9 @@ export async function getStorageObject(
   bucket: string,
   path: string,
 ): Promise<StorageDownloadResult> {
-  const supabase = getSupabaseStorageClient();
-  const { data, error } = await supabase.storage.from(bucket).download(path);
-  return { data, error };
+  const supabase = getSupabaseStorageClient()
+  const { data, error } = await supabase.storage.from(bucket).download(path)
+  return { data, error }
 }
 
 /**
@@ -146,19 +146,19 @@ export function getStoragePublicUrl(
   bucket: string,
   path: string,
   options?: {
-    download?: string | boolean;
+    download?: string | boolean
     transform?: {
-      width?: number;
-      height?: number;
-      resize?: "cover" | "contain" | "fill";
-      quality?: number;
-      format?: "origin";
-    };
+      width?: number
+      height?: number
+      resize?: "cover" | "contain" | "fill"
+      quality?: number
+      format?: "origin"
+    }
   },
 ): StoragePublicUrlResult {
-  const supabase = getSupabaseStorageClient();
-  const { data } = supabase.storage.from(bucket).getPublicUrl(path, options);
-  return { data };
+  const supabase = getSupabaseStorageClient()
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path, options)
+  return { data }
 }
 
 /**
@@ -170,21 +170,21 @@ export async function getStorageSignedUrl(
   path: string,
   expiresIn = 3600,
   options?: {
-    download?: string | boolean;
+    download?: string | boolean
     transform?: {
-      width?: number;
-      height?: number;
-      resize?: "cover" | "contain" | "fill";
-      quality?: number;
-      format?: "origin";
-    };
+      width?: number
+      height?: number
+      resize?: "cover" | "contain" | "fill"
+      quality?: number
+      format?: "origin"
+    }
   },
 ): Promise<StorageSignedUrlResult> {
-  const supabase = getSupabaseStorageClient();
+  const supabase = getSupabaseStorageClient()
   const { data, error } = await supabase.storage
     .from(bucket)
-    .createSignedUrl(path, expiresIn, options);
-  return { data, error };
+    .createSignedUrl(path, expiresIn, options)
+  return { data, error }
 }
 
 /**
@@ -194,9 +194,9 @@ export async function deleteStorageObjects(
   bucket: string,
   paths: string[],
 ): Promise<StorageDeleteResult> {
-  const supabase = getSupabaseStorageClient();
-  const { data, error } = await supabase.storage.from(bucket).remove(paths);
-  return { data, error };
+  const supabase = getSupabaseStorageClient()
+  const { data, error } = await supabase.storage.from(bucket).remove(paths)
+  return { data, error }
 }
 
 /**
@@ -206,7 +206,7 @@ export async function deleteStorageObject(
   bucket: string,
   path: string,
 ): Promise<StorageDeleteResult> {
-  return deleteStorageObjects(bucket, [path]);
+  return deleteStorageObjects(bucket, [path])
 }
 
 /**
@@ -217,9 +217,9 @@ export async function listStorageObjects(
   path?: string,
   options?: SearchOptions,
 ): Promise<StorageListResult> {
-  const supabase = getSupabaseStorageClient();
+  const supabase = getSupabaseStorageClient()
   const { data, error } = await supabase.storage
     .from(bucket)
-    .list(path || "", options);
-  return { data, error };
+    .list(path || "", options)
+  return { data, error }
 }

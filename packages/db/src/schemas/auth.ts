@@ -1,9 +1,9 @@
-import { relations } from "drizzle-orm";
-import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
-import { agents } from "./agents.js";
-import { connections } from "./connections.js";
-import { conversations } from "./conversations.js";
-import { runs } from "./runs.js";
+import { relations } from "drizzle-orm"
+import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core"
+import { agents } from "./agents.js"
+import { connections } from "./connections.js"
+import { conversations } from "./conversations.js"
+import { runs } from "./runs.js"
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -18,7 +18,7 @@ export const user = pgTable("user", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-});
+})
 
 export const session = pgTable(
   "session",
@@ -40,7 +40,7 @@ export const session = pgTable(
       .references(() => user.id, { onDelete: "cascade" }),
   },
   (table) => [index("session_userId_idx").on(table.userId)],
-);
+)
 
 export const account = pgTable(
   "account",
@@ -71,7 +71,7 @@ export const account = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [index("account_userId_idx").on(table.userId)],
-);
+)
 
 export const verification = pgTable(
   "verification",
@@ -89,7 +89,7 @@ export const verification = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)],
-);
+)
 
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
@@ -98,18 +98,18 @@ export const userRelations = relations(user, ({ many }) => ({
   connections: many(connections),
   conversations: many(conversations),
   runs: many(runs),
-}));
+}))
 
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {
     fields: [session.userId],
     references: [user.id],
   }),
-}));
+}))
 
 export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {
     fields: [account.userId],
     references: [user.id],
   }),
-}));
+}))

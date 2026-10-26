@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations } from "drizzle-orm"
 import {
   index,
   jsonb,
@@ -6,15 +6,15 @@ import {
   pgTable,
   timestamp,
   uuid,
-} from "drizzle-orm/pg-core";
-import { conversations } from "./conversations.js";
+} from "drizzle-orm/pg-core"
+import { conversations } from "./conversations.js"
 
 export const messageRoleEnum = pgEnum("message_role", [
   "system",
   "user",
   "assistant",
   "tool",
-]);
+])
 
 export const messages = pgTable(
   "messages",
@@ -36,14 +36,14 @@ export const messages = pgTable(
       table.createdAt,
     ),
   ],
-);
+)
 
 export const messagesRelations = relations(messages, ({ one }) => ({
   conversation: one(conversations, {
     fields: [messages.conversationId],
     references: [conversations.id],
   }),
-}));
+}))
 
-export type Message = typeof messages.$inferSelect;
-export type NewMessage = typeof messages.$inferInsert;
+export type Message = typeof messages.$inferSelect
+export type NewMessage = typeof messages.$inferInsert

@@ -1,5 +1,5 @@
-import type { AppType } from "@openbots/api-contract";
-import { hc } from "hono/client";
+import type { AppType } from "@openbots/api-contract"
+import { hc } from "hono/client"
 
 export type { AppType } from "@openbots/api-contract"
 
@@ -11,10 +11,10 @@ export function createClient(
   baseUrl?: string,
   options?: Parameters<typeof hc>[1],
 ) {
-  const url = baseUrl ?? getApiBaseUrl();
-  return hc<AppType>(url, options);
+  const url = baseUrl ?? getApiBaseUrl()
+  return hc<AppType>(url, options)
 }
 
-export const api = createClient;
+export const api = createClient
 
-export type Client = ReturnType<typeof createClient>;
+export type Client = ReturnType<typeof createClient>

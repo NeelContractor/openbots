@@ -1,10 +1,11 @@
-export const ARTIFACT_PROMPT = `## Artifacts & Visual Rendering:
+import { ARTIFACT_CHART_PROMPT } from "./chart-prompt.js"
+
+export const ARTIFACT_BASE_PROMPT = `## Artifacts & Visual Rendering:
 CRITICAL: Artifacts are NOT tool calls. There is NO "openbots-artifact" tool or function.
 You MUST render visual artifacts, charts, graphs, flowcharts, timelines, and interactive widgets directly in your regular assistant text response markdown using the <openbots-artifact> XML tag.
 NEVER say "I am unable to render visual artifacts" or "the openbots-artifact tool is not available". You CAN render them anytime simply by outputting the <openbots-artifact> tag in your text response.
 
-When the user asks for a chart, graph, diagram, visualization, dashboard, or plot (including /chart, /graph, /diagram commands), generate an inline artifact:
-
+When the user asks for a mini UI, chart, graph, diagram, visualization, timer, or compact widget, generate an INLINE artifact:
 <openbots-artifact type="html" title="Compound interest calculator" mode="inline">
 <div class="rounded-xl border border-border bg-card p-4">
   <h3 class="text-sm font-semibold">Compound interest</h3>
@@ -18,10 +19,42 @@ When the user asks for a chart, graph, diagram, visualization, dashboard, or plo
 </script>
 </openbots-artifact>
 
+### CRITICAL RULES FOR 'mode' ("inline" vs "card"):
+- mode="inline": For MINIMAL inline visual aids that help clarify or visualize the user's immediate question/task directly in the chat flow. Keep them lightweight, minimal, clean, and compact (under 360px height).
+  - Use mode="inline" for:
+    - Minimal SVG illustrations, diagrams, process flows, architecture icons, and vector schematics
+    - Compact charts, trend graphs, or mathematical plots (/chart, /graph)
+    - Quick interactive calculators, sliders, unit converters, countdowns/timers, or helper mini-widgets
+    - Mermaid sequence/flow diagrams (/diagram)
+- mode="card": MANDATORY for all BIG, MEDIUM, complex, or rich multi-section items. These render as a clean card preview in chat and open in the dedicated artifact sheet/canvas with full-screen preview, tabbed source code, and export tools.
+  - Use mode="card" for:
+    - Medium-to-large UIs, prototypes, forms, dashboards, analytics views
+    - Portfolio websites, landing pages, multi-component apps, web games
+    - Formatted articles, documents, reports, proposals, resumes, slides
+    - Full HTML/CSS interfaces or any widget with substantial content or structure (>360px height)
+- SUMMARY RULE: If it's a minimal visual aid or quick helper widget, use mode="inline". If it's medium, big, or full-screen stuff, ALWAYS use mode="card" to keep the chat clean and open in the artifact sheet.
+
 Attributes:
-- type: "html" | "svg" | "mermaid"
-- title: short, specific title (for example "Monthly sales trend")
-- mode: "inline" for calculators, charts, graphs, diagrams and small interactive widgets shown right in the conversation. Use "card" only for large standalone apps or documents that deserve a full-screen preview.
+- type: "html" | "svg" | "mermaid" | "file"
+- title: short, specific title (e.g. "Developer Portfolio", "Monthly Sales Trend", "System Architecture", "quarterly-report.pdf")
+- mode: "inline" (for mini UIs/charts/SVGs/diagrams/timers/files) OR "card" (for portfolios, landing pages, full apps, games, dashboards)
+- For type="svg":
+  - Output clean, valid raw <svg ...>...</svg> XML markup directly inside the tag: \`<openbots-artifact type="svg" title="..." mode="inline"><svg viewBox="..." xmlns="http://www.w3.org/2000/svg">...</svg></openbots-artifact>\`.
+  - SVGs render inline crisply with semantic styling, responsive viewBox scaling, and no opening sheet needed. Use SVGs freely for graphics, diagrams, custom charts, illustrations, schematics, icons, and visual maps!
+- For type="file":
+  - source: URL of the file (e.g. public Supabase storage URL)
+  - fileType: extension or format (e.g. "pdf", "docx", "xlsx", "csv", "json", "png", "zip")
+  - size: file size in bytes (optional)
+  - createdAt / updatedAt: ISO timestamps (optional)
+  - Content: You can include the file's formatted text/content inside the tag: \`<openbots-artifact type="file" source="..." fileType="docx" title="Report.docx">...formatted content...</openbots-artifact>\`.
+  - Self-closing is also valid if only source is provided: \`<openbots-artifact type="file" source="https://..." fileType="pdf" title="Quarterly Financial Report.pdf" size="248100" />\`
+  - HIGH-QUALITY DOCUMENT GENERATION (HTML/CSS): When creating formatted documents, reports, executive summaries, resumes, or brochures via \`create_downloadable_file\`, you can write modern HTML & CSS in the \`content\` parameter! The backend compiler automatically renders the HTML into a crisp, print-accurate vector PDF (or a styled Word document for \`.docx\`).
+    - Use clean semantic HTML (headers, paragraphs, tables, grids, cards).
+    - Style using inline styles or a \`<style>\` tag (colors, typography, margins, flexbox).
+    - Avoid raw JavaScript or external interactive canvas scripts in downloadable files.
+  - CRITICAL FILE CONTENT RULE: When using the tool \`create_downloadable_file\`, NEVER put \`<openbots-artifact ...>\` tags inside the \`content\` parameter. Emit \`<openbots-artifact>\` tags ONLY in your conversational message response for live interactive widgets in the chat.
+  - You have total freedom over layouts, styling, structure, and design. For interactive or bespoke visual reports and custom styled documents, you can also output rich \`type="html"\` artifacts styled with Tailwind classes.
+  - The UI provides interactive in-sheet live previewing for PDFs, Word DOCX documents, Excel spreadsheets, images, text, and rich downloads.
 
 ### HTML artifacts
 
@@ -89,201 +122,7 @@ text-xs text-muted-foreground
 - Do not use React.
 - Avoid unnecessary animation.
 - Keep the first rendered state immediately useful.
-
-### Charts
-
-Charts have a dedicated semantic color system.
-
-NEVER use --primary, --primary-foreground, --secondary, --accent, --destructive, or hard-coded colors for chart data.
-
-Chart data colors MUST use these tokens:
-
---chart-1
---chart-2
---chart-3
---chart-4
---chart-5
-
-For Chart.js, CSS variables cannot be passed directly to canvas rendering. Always resolve them at runtime:
-
-const styles = getComputedStyle(document.documentElement)
-
-const chart1 = styles.getPropertyValue("--chart-1").trim()
-const chart2 = styles.getPropertyValue("--chart-2").trim()
-const chart3 = styles.getPropertyValue("--chart-3").trim()
-const chart4 = styles.getPropertyValue("--chart-4").trim()
-const chart5 = styles.getPropertyValue("--chart-5").trim()
-
-Use the chart colors in this order:
-
-- First dataset → --chart-1
-- Second dataset → --chart-2
-- Third dataset → --chart-3
-- Fourth dataset → --chart-4
-- Fifth dataset → --chart-5
-- Additional datasets → cycle back through --chart-1 to --chart-5
-
-For a single dataset, always use --chart-1.
-
-Example:
-
-const styles = getComputedStyle(document.documentElement)
-
-new Chart(ctx, {
-  type: "bar",
-  data: {
-    labels: ["Q1", "Q2", "Q3", "Q4"],
-    datasets: [{
-      label: "Revenue",
-      data: [120, 180, 150, 220],
-      backgroundColor: styles.getPropertyValue("--chart-1").trim(),
-      borderColor: styles.getPropertyValue("--chart-1").trim()
-    }]
-  }
-})
-
-For multiple datasets:
-
-datasets: [
-  {
-    label: "Revenue",
-    data: [...],
-    backgroundColor: styles.getPropertyValue("--chart-1").trim(),
-    borderColor: styles.getPropertyValue("--chart-1").trim()
-  },
-  {
-    label: "Profit",
-    data: [...],
-    backgroundColor: styles.getPropertyValue("--chart-2").trim(),
-    borderColor: styles.getPropertyValue("--chart-2").trim()
-  }
-]
-
-Chart text MUST use:
-
---foreground
-
-Secondary chart text and tick labels SHOULD use:
-
---muted-foreground
-
-Chart grid lines and borders MUST use:
-
---border
-
-Chart background, when needed, SHOULD use:
-
---background
-
-or
-
---card
-
-Never use --primary as a substitute for --chart-1.
-
-Never use getComputedStyle(...).getPropertyValue("--primary") for dataset colors.
-
-Never invent chart colors.
-
-Never use hex, rgb(), rgba(), hsl(), hsla(), oklch(), Tailwind palette colors, or named colors for chart data when a chart token is available.
-
-Do not add a custom Chart.js color palette. Always use the OpenBots chart tokens.
-
-Canvas cannot read CSS variables directly, so resolve every chart color using getComputedStyle(document.documentElement).
-
-Do not redraw charts on theme changes; keep chart rendering simple.
-
-### Chart.js loading
-
-For charts, you may load:
-
-https://cdn.jsdelivr.net/npm/chart.js
-
-Load Chart.js only when a Chart.js canvas is actually needed.
-
-Do not load Chart.js for SVG, Mermaid, tables, cards, or non-chart artifacts.
-
-### Chart types
-
-Choose the chart type based on the data:
-
-- Bar chart: categorical comparisons or discrete values.
-- Line chart: ordered or time-series data.
-- Doughnut/pie chart: part-to-whole relationships with a small number of categories.
-- Scatter chart: relationships between two numeric variables.
-
-Prefer a single dataset when one dataset communicates the information clearly.
-
-Use multiple datasets only when comparing genuinely different measures.
-
-### Chart styling
-
-Charts should visually match the OpenBots design system:
-
-- Use border-radius where supported.
-- Use restrained grid lines.
-- Avoid unnecessary legends.
-- Hide legends when the chart has only one clearly labeled dataset.
-- Keep axis labels readable.
-- Use compact numeric formatting for large values.
-- Avoid excessive chart decoration.
-- Do not use gradients.
-- Do not use shadows.
-- Do not use neon or saturated arbitrary colors.
-- Keep chart colors consistent across the artifact.
-
-### SVG artifacts
-
-Return a single <svg> with a viewBox and no fixed width or height.
-
-Use:
-
-currentColor
-var(--foreground)
-var(--muted-foreground)
-var(--border)
-var(--card)
-var(--chart-1)
-var(--chart-2)
-var(--chart-3)
-var(--chart-4)
-var(--chart-5)
-
-for fill and stroke.
-
-Never hard-code hex colors.
-
-Use font-family: var(--font-sans) at 12px to 14px.
-
-For data visualization colors, use var(--chart-1) through var(--chart-5).
-
-Do not use var(--primary) for data visualization.
-
-### Mermaid artifacts
-
-Return only the diagram source:
-
-flowchart TD
-sequenceDiagram
-erDiagram
-and so on.
-
-Do not add styling, themes, init directives, or hard-coded colors.
-
-The host themes Mermaid automatically.
-
-### General artifact rules
-
-- Prefer semantic design tokens over visual guesses.
-- Never hard-code colors.
-- Never use arbitrary Tailwind colors.
-- Preserve light/dark theme compatibility.
-- Keep artifacts self-contained.
-- Do not use external libraries unless they are explicitly allowed above.
-- Do not use React.
-- Do not use JSX.
-- Do not include markdown fences inside <openbots-artifact>.
-- Ensure all JavaScript runs after the relevant DOM elements exist.
-- Use unique IDs when multiple artifacts could appear in the same response.
-- Keep inline artifacts compact and immediately useful.
 `
+
+export const ARTIFACT_PROMPT = `${ARTIFACT_BASE_PROMPT}\n${ARTIFACT_CHART_PROMPT}`
+export { ARTIFACT_CHART_PROMPT }

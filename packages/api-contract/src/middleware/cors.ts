@@ -1,4 +1,4 @@
-import { cors } from "hono/cors";
+import { cors } from "hono/cors"
 
 function isOriginAllowed(origin: string): boolean {
   if (
@@ -7,38 +7,38 @@ function isOriginAllowed(origin: string): boolean {
     origin === "http://127.0.0.1:3000" ||
     origin === "http://127.0.0.1:3001"
   ) {
-    return true;
+    return true
   }
 
-  const appUrl = process.env.APP_URL;
+  const appUrl = process.env.APP_URL
   if (appUrl && (origin === appUrl || origin === appUrl.replace(/\/$/, ""))) {
-    return true;
+    return true
   }
 
-  const publicAppUrl = process.env.NEXT_PUBLIC_APP_URL;
+  const publicAppUrl = process.env.NEXT_PUBLIC_APP_URL
   if (
     publicAppUrl &&
     (origin === publicAppUrl || origin === publicAppUrl.replace(/\/$/, ""))
   ) {
-    return true;
+    return true
   }
 
   try {
-    const { hostname } = new URL(origin);
+    const { hostname } = new URL(origin)
     if (hostname.endsWith(".vercel.app")) {
-      return true;
+      return true
     }
   } catch {
-    return false;
+    return false
   }
 
-  return false;
+  return false
 }
 
 export const corsMiddleware = cors({
   origin: (origin) => {
-    if (!origin) return null;
-    return isOriginAllowed(origin) ? origin : null;
+    if (!origin) return null
+    return isOriginAllowed(origin) ? origin : null
   },
   allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowHeaders: ["Content-Type", "Authorization", "Cookie", "x-user-id"],
@@ -50,4 +50,4 @@ export const corsMiddleware = cors({
   ],
   credentials: true,
   maxAge: 86400,
-});
+})
